@@ -1,0 +1,30 @@
+@import "tailwindcss";
+
+@theme {
+  --color-light: #ffffff;
+  --color-dark: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    color: var(--color-light);
+    background: var(--color-dark);
+    font-family: Arial, Helvetica, sans-serif;
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  body {
+    color: var(--color-dark);
+    background: var(--color-light);
+    font-family: Arial, Helvetica, sans-serif;
+  }
+}
+
+h1 {
+  @apply text-3xl mt-2 mb-4 font-bold;
+}
+
+input {
+  @apply bg-gray-200 px-5 py-1 rounded text-lg;
+}
