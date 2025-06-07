@@ -11,12 +11,12 @@ export default function TodosForm({ d }) {
         e.preventDefault();
         console.log(d);
         console.log(format(d, "yyyy-MM-dd"));
-        // const form = e.currentTarget;
-        // createTodo({
-        //   text: form.text.value,
-        //   deadline: format(d, "yyyy-MM-dd"),
-        // });
-        // form.reset();
+        const form = e.currentTarget;
+        createTodo({
+          text: form.text.value,
+          deadline: format(d, "yyyy-MM-dd"),
+        });
+        form.reset();
       }}
     >
       <input type="text" name="text" placeholder="Add a todo..." />
