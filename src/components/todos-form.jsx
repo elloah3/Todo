@@ -4,17 +4,18 @@ import { format } from "date-fns";
 
 export default function TodosForm({ d }) {
   const createTodo = useMutation(api.todos.createTodo);
+  const midnightDate = new Date(d + "T00:00:00");
 
   return (
     <form
       onSubmit={(e) => {
         e.preventDefault();
         console.log(d);
-        console.log(format(d, "yyyy-MM-dd"));
+        console.log(format(midnightDate, "yyyy-MM-ddT00:00:00"));
         const form = e.currentTarget;
         createTodo({
           text: form.text.value,
-          deadline: format(d, "yyyy-MM-dd"),
+          deadline: format(midnightDate, "yyyy-MM-dd"),
         });
         form.reset();
       }}

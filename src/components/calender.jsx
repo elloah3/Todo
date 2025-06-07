@@ -18,7 +18,7 @@ export default function Calender({ todos, d, setD }) {
   function handleDateChange(event) {
     console.log("changed value", event.target.value); // 2025-06-06 LT
     let dateObj = new Date(event.target.value + "T00:00:00");
-    console.log("dateObj", dateObj);  // 2025-06-05 PST
+    console.log("dateObj", dateObj); // 2025-06-05 PST
     setD(dateObj);
     setDates(getDates(dateObj));
   }
@@ -32,13 +32,14 @@ export default function Calender({ todos, d, setD }) {
           <button
             className="bg-amber-200 p-2 cursor-pointer "
             key={d.getTime()}
-            onClick={() => setD(format(d, "yyyy-MM-dd"))}
+            onClick={() => {
+              setD(format(d, "yyyy-MM-dd"));
+              console.log(d);
+            }}
           >
             <div>{format(d, "EEE")}</div>
             <div>{format(d, "dd")}</div>
-            <div>
-              {todos.filter((t) => isSameDay(d, t._creationTime)).length}
-            </div>
+            <div>{todos.filter((t) => isSameDay(d, t.deadline)).length}</div>
           </button>
         ))}
         <button onClick={() => handleChange(5)}>next</button>
