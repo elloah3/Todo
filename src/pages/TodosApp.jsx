@@ -3,19 +3,20 @@ import { useAuthActions } from "@convex-dev/auth/react";
 
 import { useState } from "react";
 import { api } from "../../convex/_generated/api";
-import { isSameDay } from "date-fns";
+import { format, isSameDay, startOfDay } from "date-fns";
 import Calender from "../components/calender";
 import TodosList from "../components/todos-list";
 import TodosForm from "../components/todos-form";
 
 export default function TodosApp() {
   const todos = useQuery(api.todos.readTodos);
-  const [d, setD] = useState(new Date());
+  const [d, setD] = useState(startOfDay(new Date()));
 
   if (!todos) return <div>loading</div>;
 
   return (
     <div>
+      <div className="text-center text-2xl">d: {format(d, "yyyy-MM-dd HH:mm")}</div>
       <Calender todos={todos} d={d} setD={setD} />
       <div className="bg-gray-300 rounded-2xl p-4">
         <TodosForm d={d} />
