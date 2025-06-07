@@ -21,7 +21,7 @@ export const createTodo = mutation({
     args: {},
     async handler(ctx){
       const userId = await getAuthUserId(ctx);
-      if (!userId) return new Error("Unauthenticated");
+      if (!userId) throw new Error("Unauthenticated");
       return await ctx.db.query("todos").withIndex("by_userid", q => q.eq("userId", userId)).collect();
     },
   });
