@@ -16,8 +16,9 @@ export default function Calender({ todos, d, setD }) {
   }
 
   function handleDateChange(event) {
-    console.log("changed value", event.target.value);
-    let dateObj = new Date(event.target.value);
+    console.log("changed value", event.target.value); // 2025-06-06 LT
+    let dateObj = new Date(event.target.value + "T00:00:00");
+    console.log("dateObj", dateObj);  // 2025-06-05 PST
     setD(dateObj);
     setDates(getDates(dateObj));
   }
