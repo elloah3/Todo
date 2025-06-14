@@ -24,7 +24,7 @@ export default function Calender({ todos, d, setD }) {
   return (
     <div>
       <input type="date" onChange={handleDateChange} />
-      <div className="flex justify-evenly mb-5">
+      <div className="flex flex-col justify-evenly mb-5">
         <button onClick={() => handleChange(-5)}>prev</button>
         {dates.map((dd) => (
           <button
