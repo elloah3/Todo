@@ -25,6 +25,7 @@ export default function TodosApp() {
     <div>
       <div className="flex justify-around p-2">
         <div className="flex flex-col w-1/2">
+          <div>d: {format(d, "yyyy-MM-dd HH:mm")}</div>
           <div className="flex w-full h-1/2">
             <UpcomingTodos
               todos={todos.filter((v) =>
@@ -33,8 +34,12 @@ export default function TodosApp() {
                   end: tenFromNow,
                 }),
               )}
+              setD={setD}
             />
-            <Overdue todos={todos.filter((v) => isPast(v.deadline))} />
+            <Overdue
+              todos={todos.filter((v) => isPast(v.deadline))}
+              setD={setD}
+            />
           </div>
           <div className="bg-gray-300 rounded-2xl p-4 h-full">
             <TodosForm d={d} />
