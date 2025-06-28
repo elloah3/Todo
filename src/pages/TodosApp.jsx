@@ -23,7 +23,7 @@ export default function TodosApp() {
 
   return (
     <div>
-      <div className="flex justify-around p-2">
+      <div className="flex justify-around p-2 h-screen">
         <div className="flex flex-col w-1/2">
           <div>d: {format(d, "yyyy-MM-dd HH:mm")}</div>
           <div className="flex w-full h-1/2">
