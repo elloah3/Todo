@@ -7,25 +7,22 @@ function getDates(d) {
 }
 
 export default function Calender({ todos, d, setD }) {
-  let [dates, setDates] = useState(getDates(d));
-
-  function handleChange(delta) {
-    let middleDate = dates[2];
-    let nextMiddleDate = addDays(middleDate, delta);
-    setDates(getDates(nextMiddleDate));
-  }
+  let dates = getDates(d);
 
   function handleDateChange(event) {
     let dateObj = new Date(event.target.value + "T00:00:00");
     setD(dateObj);
-    setDates(getDates(dateObj));
   }
 
   return (
     <div>
-      <input type="date" onChange={handleDateChange} />
+      <input
+        type="date"
+        className="my-2"
+        onChange={handleDateChange}
+        //value={format(d, "yyyy-MM-dd")}
+      />
       <div className="flex flex-col justify-evenly mb-5">
-        <button onClick={() => handleChange(-5)}>prev</button>
         {dates.map((dd) => (
           <button
             className="bg-amber-200 p-2 cursor-pointer "
@@ -45,7 +42,6 @@ export default function Calender({ todos, d, setD }) {
             </div>
           </button>
         ))}
-        <button onClick={() => handleChange(5)}>next</button>
       </div>
     </div>
   );

@@ -16,7 +16,7 @@ export default function Overdue({ todos, setD }) {
               onClick={() => retrieveDeadline(t.deadline)}
             >
               {t.text}
-              <div>{t.deadline}</div>
+              <div className="ml-2 text-gray-500 ">{t.deadline}</div>
             </button>
           ))}
         </div>
