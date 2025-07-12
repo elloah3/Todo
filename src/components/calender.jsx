@@ -1,18 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import {
-  addDays,
-  eachDayOfInterval,
-  endOfMonth,
-  format,
-  getDate,
-  isSameDay,
-  startOfMonth,
-  subDays,
-} from "date-fns";
+import { addDays, eachDayOfInterval, format, subDays } from "date-fns";
 import InfiniteScroll from "react-infinite-scroll-component";
 
 function getInitialDates(d) {
-  const start = d;
+  const start = subDays(d, 10);
   const end = addDays(d, 10);
 
   let dates = eachDayOfInterval({ start, end });
@@ -21,16 +12,37 @@ function getInitialDates(d) {
 
 export default function Calender({ todos, d, setD }) {
   let [dates, setDates] = useState(getInitialDates(d));
+  const selectedDateRef = useRef(null);
   const [hasMore, setHasMore] = useState(true);
+  const [hasMorePast, setHasMorePast] = useState(true);
+
+  useEffect(() => {
+    if (selectedDateRef.current) {
+      selectedDateRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    }
+  }, [d, dates]);
 
   function handleDateChange(event) {
     let dateObj = new Date(event.target.value + "T00:00:00");
     setD(dateObj);
     setDates(getInitialDates(dateObj));
     setHasMore(true);
+    setHasMorePast(true);
   }
 
-  const generateMoreDates = useCallback(() => {
+  const generateMorePastDates = useCallback(() => {
+    const firstDate = dates[0];
+    const newDates = eachDayOfInterval({
+      start: subDays(firstDate, 10),
+      end: subDays(firstDate, 1),
+    });
+    return newDates;
+  }, [dates]);
+
+  const generateMoreFutureDates = useCallback(() => {
     const lastDate = dates[dates.length - 1];
     const newDates = eachDayOfInterval({
       start: addDays(lastDate, 1),
@@ -39,14 +51,25 @@ export default function Calender({ todos, d, setD }) {
     return newDates;
   }, [dates]);
 
-  function fetchMoreData() {
+  function fetchMoreFutureData() {
     setTimeout(() => {
-      const moreDates = generateMoreDates();
-      if (moreDates == 0) {
+      const moreDates = generateMoreFutureDates();
+      if (moreDates.length === 0) {
         setHasMore(false);
         return;
       }
       setDates((prevDates) => [...prevDates, ...moreDates]);
+    }, 500);
+  }
+
+  function fetchMorePastData() {
+    setTimeout(() => {
+      const moreDates = generateMorePastDates();
+      if (moreDates.length === 0) {
+        setHasMorePast(false);
+        return;
+      }
+      setDates((prevDates) => [...moreDates, ...prevDates]);
     }, 500);
   }
 
@@ -58,41 +81,55 @@ export default function Calender({ todos, d, setD }) {
         onChange={handleDateChange}
         value={format(d, "yyyy-MM-dd")}
       />
-
-      <div>Testing Infinite Scroll</div>
-      <div className="h-1/2 mb-5 overflow-y-scroll">
+      <div id="calender-container" className="h-1/2 mb-5 overflow-y-scroll">
+        <>{/*fetchMorePastData isn't generating correctly*/}</>
         <InfiniteScroll
-          className="bg-blue-200 flex flex-col"
-          height={300}
           dataLength={dates.length}
-          next={fetchMoreData}
-          hasMore={hasMore}
-          loader={<h4>Loading...</h4>}
-          endMessage={
-            <p style={{ textAlign: "center" }}>
-              <b>You have seen it all</b>
-            </p>
-          }
+          next={fetchMorePastData}
+          hasMore={hasMorePast}
+          loader={<h4>Loading past...</h4>}
+          scrollableTarget="calender-container"
+          inverse={true}
         >
-          {dates.map((dd) => (
-            <button
-              className="cursor-pointer"
-              key={dd.getTime()}
-              onClick={() => {
-                setD(dd);
-              }}
-            >
-              <div>{format(dd, "MM-dd HH:mm")}</div>
-              {/* <div>{format(dd, "EEE")}</div>
-            <div>{format(dd, "dd")}</div> */}
-              <div>
-                {
-                  todos.filter((t) => format(dd, "yyyy-MM-dd") === t.deadline)
-                    .length
+          <InfiniteScroll
+            className="bg-blue-200 flex flex-col"
+            dataLength={dates.length}
+            next={fetchMoreFutureData}
+            hasMore={hasMore}
+            loader={<h4>Loading...</h4>}
+            scrollableTarget="calender-container"
+          >
+            {dates.map((dd) => (
+              <button
+                className="cursor-pointer"
+                key={dd.getTime()}
+                ref={
+                  format(dd, "yyyy-MM-dd") === format(d, "yyyy-MM-dd")
+                    ? selectedDateRef
+                    : null
                 }
-              </div>
-            </button>
-          ))}
+                style={{
+                  backgroundColor:
+                    format(dd, "yyyy-MM-dd") === format(d, "yyyy-MM-dd")
+                      ? "lightblue"
+                      : "lightgray",
+                }}
+                onClick={() => {
+                  setD(dd);
+                }}
+              >
+                <div>{format(dd, "MM-dd HH:mm")}</div>
+                {/* <div>{format(dd, "EEE")}</div>
+            <div>{format(dd, "dd")}</div> */}
+                <div>
+                  {
+                    todos.filter((t) => format(dd, "yyyy-MM-dd") === t.deadline)
+                      .length
+                  }
+                </div>
+              </button>
+            ))}
+          </InfiniteScroll>
         </InfiniteScroll>
       </div>
     </div>
