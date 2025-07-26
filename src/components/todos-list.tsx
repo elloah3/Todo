@@ -36,13 +36,14 @@ export default function TodosList({ todos }: TodoListParams) {
   );
 }
 
-function isOverDue(deadline: string): boolean {
+function isOverDue(deadline: string): number {
   const d = new Date(deadline);
   const dateDiff = differenceInDays(new Date(), d);
-  return dateDiff < 1;
+  return dateDiff;
 }
 
 function getColor(deadline: string): string {
-  if (isOverDue(deadline)) return "bg-gray-50";
-  return "bg-red-100";
+  if (isOverDue(deadline) > 1 ) return "bg-red-100";
+  if (isOverDue(deadline) < 0 ) return "bg-green-50";
+  return "bg-gray-50";
 }

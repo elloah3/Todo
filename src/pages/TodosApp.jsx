@@ -17,6 +17,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useRef } from "react";
+import CalendarBlock from "../components/calendar_block";
 
 export default function TodosApp() {
   const todos = useQuery(api.todos.readTodos);
@@ -45,16 +46,13 @@ export default function TodosApp() {
             <form
               ref={formRef}
               onSubmit={async (e) => {
-                alert(123);
                 e.preventDefault();
                 const form = e.currentTarget;
-                console.log("triggered", form);
 
                 await createTodo({
                   deadline: form.deadline.value,
                   text: form.text.value,
                 });
-                console.log("done");
 
                 // Close the dialog after successful submission
                 if (closeRef.current) {
@@ -97,6 +95,7 @@ export default function TodosApp() {
           </DialogContent>
         </Dialog>
       </div>
+      <CalendarBlock />
     </div>
   );
 }
