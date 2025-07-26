@@ -1,56 +1,81 @@
-import { Authenticated, Unauthenticated, useQuery } from "convex/react";
-import { useAuthActions } from "@convex-dev/auth/react";
+import { useMutation, useQuery } from "convex/react";
 
-import { useState } from "react";
 import { api } from "../../convex/_generated/api";
-import { format, isPast, isSameDay, startOfDay, subDays } from "date-fns";
-import Calender from "../components/calender";
 import TodosList from "../components/todos-list";
-import TodosForm from "../components/todos-form";
-import { v } from "convex/values";
-import UpcomingTodos from "../components/upcoming-todos";
-import { addDays, isWithinInterval } from "date-fns";
-import Overdue from "../components/overdue-todos";
+import { Button } from "../components/ui/button";
+
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 
 export default function TodosApp() {
   const todos = useQuery(api.todos.readTodos);
-  const [d, setD] = useState(startOfDay(new Date()));
-
+  const createTodo = useMutation(api.todos.createTodo);
   const today = new Date();
-  const tenFromNow = addDays(today, 10);
-
   if (!todos) return <div>loading</div>;
 
   return (
     <div>
-      <div className="flex justify-around p-2 h-screen">
-        <div className="flex flex-col w-1/2">
-          <div>d: {format(d, "yyyy-MM-dd HH:mm")}</div>
-          <div className="flex w-full h-1/2">
-            <UpcomingTodos
-              todos={todos.filter((v) =>
-                isWithinInterval(v.deadline, {
-                  start: subDays(today, 1),
-                  end: tenFromNow,
-                }),
-              )}
-              setD={setD}
-            />
-            <Overdue
-              todos={todos.filter((v) => isPast(v.deadline))}
-              setD={setD}
-            />
-          </div>
-          <div className="bg-gray-300 rounded-2xl p-4 h-full">
-            <TodosForm d={d} />
-            <TodosList
-              todos={todos.filter((v) =>
-                isSameDay(v.deadline, format(d, "yyyy-MM-dd")),
-              )}
-            />
-          </div>
-        </div>
-        <Calender todos={todos} d={d} setD={setD} />
+      <TodosList todos={todos} />
+      <div className="fixed bottom-16 right-2">
+        <Dialog>
+          <form
+            onSubmit={(e) => {
+              alert(123);
+              e.preventDefault();
+              const form = e.currentTarget;
+              console.log("triggered", form);
+
+              createTodo({
+                deadline: form.deadline.value,
+                text: form.text.value,
+              });
+              console.log("done");
+            }}
+          >
+            <DialogTrigger asChild>
+              <Button variant="outline">Add</Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Edit profile</DialogTitle>
+                <DialogDescription>
+                  Make changes to your profile here. Click save when you&apos;re
+                  done.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-4">
+                <div className="grid gap-3">
+                  <Label htmlFor="name-1">Name</Label>
+                  <Input id="name-1" name="text" defaultValue="" />
+                </div>
+                <div className="grid gap-3">
+                  <Label htmlFor="username-1">Deadline</Label>
+                  <Input
+                    id="username-1"
+                    name="deadline"
+                    defaultValue="2025-04-05"
+                  />
+                </div>
+              </div>
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button variant="outline">Cancel</Button>
+                </DialogClose>
+                <Button type="submit">Save changes</Button>
+              </DialogFooter>
+            </DialogContent>
+          </form>
+        </Dialog>
       </div>
     </div>
   );

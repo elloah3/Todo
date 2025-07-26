@@ -1,5 +1,4 @@
 import { useAuthActions } from "@convex-dev/auth/react";
-import Button from "./ui/button";
 import { useState } from "react";
 
 export default function Authform() {
@@ -33,9 +32,9 @@ export default function Authform() {
             <input type="password" name="password" placeholder="Password" />
           </div>
           <input type="hidden" name="flow" value={flow} />
-          <Button type="submit">
+          <button type="submit">
             {flow === "signIn" ? "Sign In" : "Sign Up"}
-          </Button>
+          </button>
         </form>
         <div>
           {flow === "signIn" ? "Need an account?" : "Already have an account?"}{" "}

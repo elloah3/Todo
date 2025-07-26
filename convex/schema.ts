@@ -15,6 +15,7 @@ export default defineSchema({
   todos: defineTable({
     text: v.string(),
     userId: v.id("users"),
-    deadline: v.string()
+    deadline: v.string(),
+    starred: v.optional(v.boolean())
   }).index("by_userid", ['userId'])
 });
