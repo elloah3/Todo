@@ -16,11 +16,14 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { useRef } from "react";
 
 export default function TodosApp() {
   const todos = useQuery(api.todos.readTodos);
   const createTodo = useMutation(api.todos.createTodo);
   const today = new Date();
+  const formRef = useRef(null);
+  const closeRef = useRef(null);
   if (!todos) return <div>loading</div>;
 
   return (
@@ -28,31 +31,37 @@ export default function TodosApp() {
       <TodosList todos={todos} />
       <div className="fixed bottom-16 right-2">
         <Dialog>
-          <form
-            onSubmit={(e) => {
-              alert(123);
-              e.preventDefault();
-              const form = e.currentTarget;
-              console.log("triggered", form);
+          <DialogTrigger asChild>
+            <Button variant="outline">Add</Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Edit profile</DialogTitle>
+              <DialogDescription>
+                Make changes to your profile here. Click save when you&apos;re
+                done.
+              </DialogDescription>
+            </DialogHeader>
+            <form
+              ref={formRef}
+              onSubmit={async (e) => {
+                alert(123);
+                e.preventDefault();
+                const form = e.currentTarget;
+                console.log("triggered", form);
 
-              createTodo({
-                deadline: form.deadline.value,
-                text: form.text.value,
-              });
-              console.log("done");
-            }}
-          >
-            <DialogTrigger asChild>
-              <Button variant="outline">Add</Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle>Edit profile</DialogTitle>
-                <DialogDescription>
-                  Make changes to your profile here. Click save when you&apos;re
-                  done.
-                </DialogDescription>
-              </DialogHeader>
+                await createTodo({
+                  deadline: form.deadline.value,
+                  text: form.text.value,
+                });
+                console.log("done");
+
+                // Close the dialog after successful submission
+                if (closeRef.current) {
+                  closeRef.current.click();
+                }
+              }}
+            >
               <div className="grid gap-4">
                 <div className="grid gap-3">
                   <Label htmlFor="name-1">Name</Label>
@@ -67,14 +76,25 @@ export default function TodosApp() {
                   />
                 </div>
               </div>
-              <DialogFooter>
-                <DialogClose asChild>
-                  <Button variant="outline">Cancel</Button>
-                </DialogClose>
-                <Button type="submit">Save changes</Button>
-              </DialogFooter>
-            </DialogContent>
-          </form>
+            </form>
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button ref={closeRef} variant="outline">
+                  Cancel
+                </Button>
+              </DialogClose>
+              <Button
+                type="button"
+                onClick={() => {
+                  if (formRef.current) {
+                    formRef.current.requestSubmit();
+                  }
+                }}
+              >
+                Save changes
+              </Button>
+            </DialogFooter>
+          </DialogContent>
         </Dialog>
       </div>
     </div>
