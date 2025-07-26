@@ -3,7 +3,7 @@ import { useAuthActions } from "@convex-dev/auth/react";
 
 import { useState } from "react";
 import { api } from "../../convex/_generated/api";
-import { format, isPast, isSameDay, startOfDay } from "date-fns";
+import { format, isPast, isSameDay, startOfDay, subDays } from "date-fns";
 import Calender from "../components/calender";
 import TodosList from "../components/todos-list";
 import TodosForm from "../components/todos-form";
@@ -30,7 +30,7 @@ export default function TodosApp() {
             <UpcomingTodos
               todos={todos.filter((v) =>
                 isWithinInterval(v.deadline, {
-                  start: today,
+                  start: subDays(today, 1),
                   end: tenFromNow,
                 }),
               )}

@@ -14,6 +14,7 @@ import type {
   FunctionReference,
 } from "convex/server";
 import type * as auth from "../auth.js";
+import type * as dates from "../dates.js";
 import type * as http from "../http.js";
 import type * as myFunctions from "../myFunctions.js";
 import type * as todos from "../todos.js";
@@ -28,6 +29,7 @@ import type * as todos from "../todos.js";
  */
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
+  dates: typeof dates;
   http: typeof http;
   myFunctions: typeof myFunctions;
   todos: typeof todos;

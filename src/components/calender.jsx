@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { addDays, eachDayOfInterval, format, subDays } from "date-fns";
 import InfiniteScroll from "react-infinite-scroll-component";
+import { api } from "../../convex/_generated/api";
+import { usePaginatedQuery } from "convex/react";
 
 function getInitialDates(d) {
   const start = subDays(d, 10);
@@ -13,8 +15,42 @@ function getInitialDates(d) {
 export default function Calender({ todos, d, setD }) {
   let [dates, setDates] = useState(getInitialDates(d));
   const selectedDateRef = useRef(null);
-  const [hasMore, setHasMore] = useState(true);
-  const [hasMorePast, setHasMorePast] = useState(true);
+
+  //Fetch past dates
+  const {
+    results: pastDatesResults,
+    status: pastDatesStatus,
+    loadMore: loadMorePastConvexDates,
+    hasMore: hasMorePastConvex,
+  } = usePaginatedQuery(
+    api.dates.getPastDates,
+    {
+      endDate:
+        dates.length > 0
+          ? format(dates[0], "yyyy-MM-dd")
+          : format(d, "yyyy-MM-dd"),
+    },
+    { initialNumItems: 0 },
+  );
+  console.log("Initial hasMorePastConvex:", hasMorePastConvex);
+
+  //Fetch future dates
+  const {
+    results: futureDatesResults,
+    status: futureDatesStatus,
+    loadMore: loadMoreFutureConvexDates,
+    hasMore: hasMoreFutureConvex,
+  } = usePaginatedQuery(
+    api.dates.getFutureDates,
+    {
+      startDate:
+        dates.length > 0
+          ? format(dates[dates.length - 1], "yyyy-MM-dd")
+          : format(d, "yyyy-MM-dd"),
+    },
+    { initialNumItems: 0 },
+  );
+  console.log("Initial hasMoreFutureConvex:", hasMoreFutureConvex);
 
   useEffect(() => {
     if (selectedDateRef.current) {
@@ -29,49 +65,70 @@ export default function Calender({ todos, d, setD }) {
     let dateObj = new Date(event.target.value + "T00:00:00");
     setD(dateObj);
     setDates(getInitialDates(dateObj));
-    setHasMore(true);
-    setHasMorePast(true);
   }
 
-  const generateMorePastDates = useCallback(() => {
-    const firstDate = dates[0];
-    const newDates = eachDayOfInterval({
-      start: subDays(firstDate, 10),
-      end: subDays(firstDate, 1),
-    });
-    return newDates;
-  }, [dates]);
+  useEffect(() => {
+    if (futureDatesStatus === "success" && futureDatesResults.length > 0) {
+      console.log(
+        "futureDatesResults received. length:",
+        futureDatesResults.length,
+        "hasMoreFutureConvex:",
+        hasMoreFutureConvex,
+      );
+      setDates((prevDates) => {
+        const newDates = [
+          ...prevDates.map((date) => format(date, "yyyy-MM-dd")),
+          ...futureDatesResults,
+        ];
+        console.log("Merging useEffect running. Results:", futureDatesResults);
+        return Array.from(new Set(newDates))
+          .map((dateString) => new Date(dateString))
+          .sort((a, b) => a.getTime() - b.getTime());
+      });
+    }
+  }, [futureDatesResults, futureDatesStatus]);
 
-  const generateMoreFutureDates = useCallback(() => {
-    const lastDate = dates[dates.length - 1];
-    const newDates = eachDayOfInterval({
-      start: addDays(lastDate, 1),
-      end: addDays(lastDate, 10),
-    });
-    return newDates;
-  }, [dates]);
+  useEffect(() => {
+    if (pastDatesStatus === "success" && pastDatesResults.length > 0) {
+      console.log(" past useEffect has been called");
+      setDates((prevDates) => {
+        const newDates = [
+          ...pastDatesResults,
+          ...prevDates.map((date) => format(date, "yyyy-MM-dd")),
+        ];
+        console.log("Merging useEffect running. Results:", pastDatesResults);
+        return Array.from(new Set(newDates))
+          .map((dateString) => new Date(dateString))
+          .sort((a, b) => a.getTime() - b.getTime());
+      });
+    }
+  }, [pastDatesResults, pastDatesStatus]);
 
-  function fetchMoreFutureData() {
-    setTimeout(() => {
-      const moreDates = generateMoreFutureDates();
-      if (moreDates.length === 0) {
-        setHasMore(false);
-        return;
-      }
-      setDates((prevDates) => [...prevDates, ...moreDates]);
-    }, 500);
+  if (futureDatesStatus === "loading" || hasMoreFutureConvex === undefined) {
+    console.log("hasMore is undefined or query is loading");
+  } else {
+    console.log("hasMoreFutureConvex:", hasMoreFutureConvex);
   }
 
-  function fetchMorePastData() {
-    setTimeout(() => {
-      const moreDates = generateMorePastDates();
-      if (moreDates.length === 0) {
-        setHasMorePast(false);
-        return;
-      }
-      setDates((prevDates) => [...moreDates, ...prevDates]);
-    }, 500);
-  }
+  const fetchMoreFutureData = useCallback(() => {
+    console.log(
+      "fetchMoreFutureData called. hasMoreFutureConvex:",
+      hasMoreFutureConvex,
+    );
+    console.log("Fetching more data (future): ", hasMoreFutureConvex);
+    if (hasMoreFutureConvex) {
+      console.log("Calling loadMore");
+      loadMoreFutureConvexDates();
+    }
+  }, [loadMoreFutureConvexDates, hasMoreFutureConvex]);
+
+  const fetchMorePastData = useCallback(() => {
+    console.log("Fetching more data (past): ", hasMorePastConvex);
+    if (hasMorePastConvex) {
+      console.log("Calling loadMore");
+      loadMorePastConvexDates();
+    }
+  }, [loadMorePastConvexDates, hasMorePastConvex]);
 
   return (
     <div>
@@ -82,21 +139,21 @@ export default function Calender({ todos, d, setD }) {
         value={format(d, "yyyy-MM-dd")}
       />
       <div id="calender-container" className="h-1/2 mb-5 overflow-y-scroll">
-        <>{/*fetchMorePastData isn't generating correctly*/}</>
         <InfiniteScroll
           dataLength={dates.length}
           next={fetchMorePastData}
-          hasMore={hasMorePast}
-          loader={<h4>Loading past...</h4>}
+          hasMore={hasMorePastConvex}
+          loader={pastDatesStatus === "loading" && <h4>Loading past...</h4>}
           scrollableTarget="calender-container"
           inverse={true}
+          className="flex flex-col-reverse"
         >
           <InfiniteScroll
-            className="bg-blue-200 flex flex-col"
+            className="bg-blue-200 flex flex-col "
             dataLength={dates.length}
             next={fetchMoreFutureData}
-            hasMore={hasMore}
-            loader={<h4>Loading...</h4>}
+            hasMore={hasMoreFutureConvex}
+            loader={futureDatesStatus === "loading" && <h4>Loading...</h4>}
             scrollableTarget="calender-container"
           >
             {dates.map((dd) => (
