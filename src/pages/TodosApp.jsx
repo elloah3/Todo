@@ -25,7 +25,7 @@ export default function TodosApp() {
           <TodosList todos={todos} />
         </div>
       </div>
-      <CalendarBlock d={d} setDate={setDate} />
+      <CalendarBlock d={d} setDate={setDate} todos={todos} />
       <AddButton d={d} />
     </div>
   );
