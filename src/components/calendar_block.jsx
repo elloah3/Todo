@@ -11,7 +11,7 @@ export default function CalendarBlock({ d, setDate, todos }) {
         onSelect={setDate}
         className="rounded-md border shadow-sm [--cell-size:--spacing(11)] md:[--cell-size:--spacing(10))]"
         captionLayout="dropdown"
-        numberofMonths={2}
+        numberofMonths={1}
         buttonVariant="ghost"
         components={{
           DayButton: ({ children, modifiers, day, ...props }) => {
