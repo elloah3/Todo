@@ -34,6 +34,15 @@ export const readTodos = query({
 export const deleteTodo = mutation({
   args: { todoId: v.id("todos") },
   async handler(ctx, args) {
-    await ctx.db.delete(args.todoId);
+    return await ctx.db.delete(args.todoId);
   },
 });
+
+
+export const toggleStar = mutation({
+  args: {todoId: v.id("todos"), newValue: v.boolean(),},
+  handler: async (ctx, {todoId, newValue}) => {
+    await ctx.db.patch(todoId, {starred: newValue});
+  },
+})
+
