@@ -4,9 +4,10 @@ import { api } from "../convex/_generated/api";
 import { TodoList } from "./TodoList";
 import { CalendarView } from "./CalendarView";
 import { AddTodoForm } from "./AddTodoForm";
+import ArchiveView from "./ArchiveView";
 
 export function TodoApp() {
-  const [activeView, setActiveView] = useState<"list" | "calendar">("list");
+  const [activeView, setActiveView] = useState<"list" | "calendar" | "archive">("list");
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   
   const todos = useQuery(api.todos.list) || [];
@@ -37,6 +38,16 @@ export function TodoApp() {
           >
             📅 Calendar
           </button>
+          <button
+            onClick={() => setActiveView("archive")}
+            className={`px-6 py-2 rounded-full font-medium transition-all ${
+              activeView === "archive"
+                ? "bg-purple-500 text-white shadow-md"
+                : "text-purple-600 hover:bg-purple-50"
+            }`}
+          >
+            📋 Archive
+          </button>
         </div>
       </div>
 
@@ -60,7 +71,7 @@ export function TodoApp() {
               />
             </div>
           </>
-        ) : (
+        ) : activeView === "calendar" ? (
           <>
             <div className="lg:col-span-2">
               <CalendarView
@@ -70,10 +81,9 @@ export function TodoApp() {
                 expanded={true}
               />
             </div>
-            <div className="lg:col-span-1">
-              <TodoList todos={todos} selectedDate={selectedDate} compact={true} />
-            </div>
           </>
+        ): (
+          <div><ArchiveView todos={todos} selectedDate={null} /></div>
         )}
       </div>
     </div>

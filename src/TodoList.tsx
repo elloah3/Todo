@@ -4,7 +4,7 @@ import { Id } from "../convex/_generated/dataModel";
 import { toast } from "sonner";
 
 interface Todo {
-  _id: Id<"todos">;
+  _id: Id<"todos2">;
   text: string;
   completed: boolean;
   deadline: string;
@@ -18,12 +18,16 @@ interface TodoListProps {
   compact?: boolean;
 }
 
-export function TodoList({ todos, selectedDate, compact = false }: TodoListProps) {
+export function TodoList({
+  todos,
+  selectedDate,
+  compact = false,
+}: TodoListProps) {
   const toggleTodo = useMutation(api.todos.toggle);
   const removeTodo = useMutation(api.todos.remove);
   const toggleImportant = useMutation(api.todos.toggleImportant);
 
-  const handleToggle = async (id: Id<"todos">) => {
+  const handleToggle = async (id: Id<"todos2">) => {
     try {
       await toggleTodo({ id });
     } catch (error) {
@@ -31,7 +35,7 @@ export function TodoList({ todos, selectedDate, compact = false }: TodoListProps
     }
   };
 
-  const handleRemove = async (id: Id<"todos">) => {
+  const handleRemove = async (id: Id<"todos2">) => {
     try {
       await removeTodo({ id });
       toast.success("Todo removed! 🗑️");
@@ -40,7 +44,7 @@ export function TodoList({ todos, selectedDate, compact = false }: TodoListProps
     }
   };
 
-  const handleToggleImportant = async (id: Id<"todos">) => {
+  const handleToggleImportant = async (id: Id<"todos2">) => {
     try {
       await toggleImportant({ id });
     } catch (error) {
@@ -54,26 +58,27 @@ export function TodoList({ todos, selectedDate, compact = false }: TodoListProps
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
 
-    if (dateString === today.toISOString().split('T')[0]) {
+    if (dateString === today.toISOString().split("T")[0]) {
       return "Today";
-    } else if (dateString === tomorrow.toISOString().split('T')[0]) {
+    } else if (dateString === tomorrow.toISOString().split("T")[0]) {
       return "Tomorrow";
     } else {
-      return date.toLocaleDateString('en-US', { 
-        month: 'short', 
-        day: 'numeric',
-        year: date.getFullYear() !== today.getFullYear() ? 'numeric' : undefined
+      return date.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year:
+          date.getFullYear() !== today.getFullYear() ? "numeric" : undefined,
       });
     }
   };
 
   const isOverdue = (deadline: string) => {
-    const today = new Date().toISOString().split('T')[0];
+    const today = new Date().toISOString().split("T")[0];
     return deadline < today;
   };
 
-  const filteredTodos = selectedDate 
-    ? todos.filter(todo => todo.deadline === selectedDate)
+  const filteredTodos = selectedDate
+    ? todos.filter((todo) => todo.deadline === selectedDate)
     : todos;
 
   if (filteredTodos.length === 0) {
@@ -84,7 +89,9 @@ export function TodoList({ todos, selectedDate, compact = false }: TodoListProps
           {selectedDate ? "No todos for this date" : "No todos yet"}
         </h3>
         <p className="text-purple-600">
-          {selectedDate ? "This day is free!" : "Add your first todo to get started!"}
+          {selectedDate
+            ? "This day is free!"
+            : "Add your first todo to get started!"}
         </p>
       </div>
     );
@@ -95,7 +102,9 @@ export function TodoList({ todos, selectedDate, compact = false }: TodoListProps
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-semibold text-purple-800 flex items-center gap-2">
           <span className="text-2xl">📋</span>
-          {selectedDate ? `Todos for ${formatDate(selectedDate)}` : "Your Todos"}
+          {selectedDate
+            ? `Todos for ${formatDate(selectedDate)}`
+            : "Your Todos"}
         </h2>
         {selectedDate && (
           <button
@@ -140,7 +149,7 @@ export function TodoList({ todos, selectedDate, compact = false }: TodoListProps
                   >
                     {todo.text}
                   </p>
-                  
+
                   <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
                       onClick={() => handleToggleImportant(todo._id)}
@@ -149,7 +158,11 @@ export function TodoList({ todos, selectedDate, compact = false }: TodoListProps
                           ? "text-yellow-500 hover:text-yellow-600"
                           : "text-gray-300 hover:text-yellow-400"
                       }`}
-                      title={todo.important ? "Remove from important" : "Mark as important"}
+                      title={
+                        todo.important
+                          ? "Remove from important"
+                          : "Mark as important"
+                      }
                     >
                       ⭐
                     </button>

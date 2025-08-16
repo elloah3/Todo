@@ -82,6 +82,22 @@ export const remove = mutation({
   },
 });
 
+export const removeAllCompleted = mutation({
+  args: { },
+  handler: async (ctx, _args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      throw new Error("Not authenticated");
+    }
+
+    const completedTodos = await ctx.db.query("todos2").filter(q => q.eq(q.field("completed"), true)).collect();
+    for(const todo of completedTodos) {
+      await ctx.db.delete(todo._id);
+    }
+    return;
+  },
+});
+
 export const toggleImportant = mutation({
   args: { id: v.id("todos2") },
   handler: async (ctx, args) => {
