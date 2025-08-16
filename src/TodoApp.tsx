@@ -1,0 +1,81 @@
+import { useState } from "react";
+import { useQuery, useMutation } from "convex/react";
+import { api } from "../convex/_generated/api";
+import { TodoList } from "./TodoList";
+import { CalendarView } from "./CalendarView";
+import { AddTodoForm } from "./AddTodoForm";
+
+export function TodoApp() {
+  const [activeView, setActiveView] = useState<"list" | "calendar">("list");
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  
+  const todos = useQuery(api.todos.list) || [];
+  const deadlineDates = useQuery(api.todos.getDeadlineDates) || [];
+
+  return (
+    <div className="space-y-6">
+      {/* View Toggle */}
+      <div className="flex justify-center">
+        <div className="bg-white rounded-full p-1 shadow-lg border border-purple-100">
+          <button
+            onClick={() => setActiveView("list")}
+            className={`px-6 py-2 rounded-full font-medium transition-all ${
+              activeView === "list"
+                ? "bg-purple-500 text-white shadow-md"
+                : "text-purple-600 hover:bg-purple-50"
+            }`}
+          >
+            📋 Todo List
+          </button>
+          <button
+            onClick={() => setActiveView("calendar")}
+            className={`px-6 py-2 rounded-full font-medium transition-all ${
+              activeView === "calendar"
+                ? "bg-purple-500 text-white shadow-md"
+                : "text-purple-600 hover:bg-purple-50"
+            }`}
+          >
+            📅 Calendar
+          </button>
+        </div>
+      </div>
+
+      {/* Add Todo Form */}
+      <div className="max-w-2xl mx-auto">
+        <AddTodoForm />
+      </div>
+
+      {/* Main Content */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {activeView === "list" ? (
+          <>
+            <div className="lg:col-span-2">
+              <TodoList todos={todos} selectedDate={selectedDate} />
+            </div>
+            <div className="lg:col-span-1">
+              <CalendarView
+                deadlineDates={deadlineDates}
+                selectedDate={selectedDate}
+                onDateSelect={setSelectedDate}
+              />
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="lg:col-span-2">
+              <CalendarView
+                deadlineDates={deadlineDates}
+                selectedDate={selectedDate}
+                onDateSelect={setSelectedDate}
+                expanded={true}
+              />
+            </div>
+            <div className="lg:col-span-1">
+              <TodoList todos={todos} selectedDate={selectedDate} compact={true} />
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
