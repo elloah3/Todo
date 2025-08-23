@@ -25,6 +25,7 @@ export default function ArchiveView({
 }: TodoListProps) {
   const allItems = useQuery(api.todos.list); // null -> []
   const removeCompleted = useMutation(api.todos.removeAllCompleted);
+  const clearHistory = useMutation(api.todos.ClearHistory);
 
   if (!allItems) return <div>loading...</div>;
   const completeItems = allItems.filter((v) => v.completed);
