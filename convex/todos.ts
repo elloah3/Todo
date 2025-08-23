@@ -95,6 +95,7 @@ export const removeAllCompleted = mutation({
       await ctx.db.delete(todo._id);
     }
     return;
+
   },
 });
 

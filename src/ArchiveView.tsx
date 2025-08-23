@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../convex/_generated/api";
 import { Id } from "../convex/_generated/dataModel";
-import { toast } from "sonner";
+import { format } from "date-fns";
 
 interface Todo {
   _id: Id<"todos2">;
@@ -24,7 +24,6 @@ export default function ArchiveView({
   compact = false,
 }: TodoListProps) {
   const allItems = useQuery(api.todos.list); // null -> []
-  const removeTodos = useMutation(api.todos.remove);
   const removeCompleted = useMutation(api.todos.removeAllCompleted);
 
   if (!allItems) return <div>loading...</div>;
@@ -32,15 +31,12 @@ export default function ArchiveView({
 
   const handleRemoveAll = async () => {
     await removeCompleted();
+    return;
   };
 
-  const handleRemove = async (id: Id<"todos2">) => {
-    try {
-      await removeTodos({ id: id });
-      toast.success("Todo removed! 🗑️");
-    } catch (error) {
-      toast.error("Failed to remove todo");
-    }
+  const isOverdue = (deadline: string) => {
+    const today = new Date().toISOString().split("T")[0];
+    return deadline < today;
   };
 
   const today = new Date();
@@ -54,19 +50,11 @@ export default function ArchiveView({
           Archive
           <button
             className="text-sm text-purple-800 hover:text-purple-400"
-            onClick={() => handleRemoveAll}
+            onClick={() => handleRemoveAll()}
           >
             Clear All
           </button>
         </h2>
-        {selectedDate && (
-          <button
-            onClick={() => window.location.reload()}
-            className="text-purple-600 hover:text-purple-800 text-sm font-medium"
-          >
-            Show All
-          </button>
-        )}
       </div>
 
       <div className="space-y-3">
@@ -95,6 +83,15 @@ export default function ArchiveView({
                       ⭐ Important
                     </span>
                   )}
+                  <span
+                    className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full ${
+                      isOverdue(todo.deadline) && !todo.completed
+                        ? "bg-red-100 text-red-800"
+                        : "bg-purple-100 text-purple-800"
+                    }`}
+                  >
+                    📅 {format(todo.deadline, "yyyy-MM-dd")}
+                  </span>
                 </div>
               </div>
             </div>

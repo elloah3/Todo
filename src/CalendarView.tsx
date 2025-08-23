@@ -9,12 +9,17 @@ interface CalendarViewProps {
   expanded?: boolean;
 }
 
-export function CalendarView({ deadlineDates, selectedDate, onDateSelect, expanded = false }: CalendarViewProps) {
+export function CalendarView({
+  deadlineDates,
+  selectedDate,
+  onDateSelect,
+  expanded = false,
+}: CalendarViewProps) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
-  
+
   const selectedDateTodos = useQuery(
     api.todos.getTodosByDate,
-    selectedDate ? { date: selectedDate } : "skip"
+    selectedDate ? { date: selectedDate } : "skip",
   );
 
   const getDaysInMonth = (date: Date) => {
@@ -26,22 +31,22 @@ export function CalendarView({ deadlineDates, selectedDate, onDateSelect, expand
     const startingDayOfWeek = firstDay.getDay();
 
     const days = [];
-    
+
     // Add empty cells for days before the first day of the month
     for (let i = 0; i < startingDayOfWeek; i++) {
       days.push(null);
     }
-    
+
     // Add all days of the month
     for (let day = 1; day <= daysInMonth; day++) {
       days.push(new Date(year, month, day));
     }
-    
+
     return days;
   };
 
   const formatDateString = (date: Date) => {
-    return date.toISOString().split('T')[0];
+    return date.toISOString().split("T")[0];
   };
 
   const hasDeadline = (date: Date) => {
@@ -65,10 +70,10 @@ export function CalendarView({ deadlineDates, selectedDate, onDateSelect, expand
     }
   };
 
-  const navigateMonth = (direction: 'prev' | 'next') => {
-    setCurrentMonth(prev => {
+  const navigateMonth = (direction: "prev" | "next") => {
+    setCurrentMonth((prev) => {
       const newDate = new Date(prev);
-      if (direction === 'prev') {
+      if (direction === "prev") {
         newDate.setMonth(prev.getMonth() - 1);
       } else {
         newDate.setMonth(prev.getMonth() + 1);
@@ -78,7 +83,10 @@ export function CalendarView({ deadlineDates, selectedDate, onDateSelect, expand
   };
 
   const days = getDaysInMonth(currentMonth);
-  const monthName = currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  const monthName = currentMonth.toLocaleDateString("en-US", {
+    month: "long",
+    year: "numeric",
+  });
 
   return (
     <div className="bg-white rounded-2xl shadow-lg border border-purple-100 p-6">
@@ -89,7 +97,7 @@ export function CalendarView({ deadlineDates, selectedDate, onDateSelect, expand
         </h2>
         <div className="flex items-center gap-2">
           <button
-            onClick={() => navigateMonth('prev')}
+            onClick={() => navigateMonth("prev")}
             className="p-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
           >
             ←
@@ -98,7 +106,7 @@ export function CalendarView({ deadlineDates, selectedDate, onDateSelect, expand
             {monthName}
           </span>
           <button
-            onClick={() => navigateMonth('next')}
+            onClick={() => navigateMonth("next")}
             className="p-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
           >
             →
@@ -108,12 +116,15 @@ export function CalendarView({ deadlineDates, selectedDate, onDateSelect, expand
 
       {/* Calendar Grid */}
       <div className="grid grid-cols-7 gap-1 mb-4">
-        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-          <div key={day} className="p-2 text-center text-sm font-medium text-purple-600">
+        {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
+          <div
+            key={day}
+            className="p-2 text-center text-sm font-medium text-purple-600"
+          >
             {day}
           </div>
         ))}
-        
+
         {days.map((date, index) => (
           <div key={index} className="aspect-square">
             {date ? (
@@ -136,9 +147,7 @@ export function CalendarView({ deadlineDates, selectedDate, onDateSelect, expand
               >
                 <div className="flex flex-col items-center justify-center h-full">
                   <span>{date.getDate()}</span>
-                  {hasDeadline(date) && (
-                    <span className="text-xs">•</span>
-                  )}
+                  {hasDeadline(date) && <span className="text-xs">•</span>}
                 </div>
               </button>
             ) : (
@@ -153,19 +162,27 @@ export function CalendarView({ deadlineDates, selectedDate, onDateSelect, expand
         <div className="mt-6 p-4 bg-purple-50 rounded-xl border border-purple-200">
           <h3 className="font-medium text-purple-800 mb-2 flex items-center gap-2">
             <span className="text-lg">📋</span>
-            {new Date(selectedDate).toLocaleDateString('en-US', { 
-              weekday: 'long',
-              month: 'long', 
-              day: 'numeric' 
+            {new Date(selectedDate).toLocaleDateString("en-US", {
+              weekday: "long",
+              month: "long",
+              day: "numeric",
             })}
           </h3>
           <div className="space-y-2">
-            {selectedDateTodos.map(todo => (
+            {selectedDateTodos.map((todo) => (
               <div key={todo._id} className="flex items-center gap-2 text-sm">
-                <span className={`w-2 h-2 rounded-full ${
-                  todo.important ? "bg-yellow-400" : "bg-purple-400"
-                }`}></span>
-                <span className={todo.completed ? "line-through text-gray-500" : "text-gray-700"}>
+                <span
+                  className={`w-2 h-2 rounded-full ${
+                    todo.important ? "bg-yellow-400" : "bg-purple-400"
+                  }`}
+                ></span>
+                <span
+                  className={
+                    todo.completed
+                      ? "line-through text-gray-500"
+                      : "text-gray-700"
+                  }
+                >
                   {todo.text}
                 </span>
                 {todo.important && <span className="text-yellow-500">⭐</span>}
