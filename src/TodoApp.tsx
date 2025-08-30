@@ -1,10 +1,10 @@
+import { useQuery } from "convex/react";
 import { useState } from "react";
-import { useQuery, useMutation } from "convex/react";
 import { api } from "../convex/_generated/api";
-import { TodoList } from "./TodoList";
-import { CalendarView } from "./CalendarView";
 import { AddTodoForm } from "./AddTodoForm";
 import ArchiveView from "./ArchiveView";
+import { CalendarView } from "./CalendarView";
+import { TodoList } from "./TodoList";
 
 export function TodoApp() {
   const [activeView, setActiveView] = useState<"list" | "calendar" | "archive">("list");
@@ -83,7 +83,7 @@ export function TodoApp() {
             </div>
           </>
         ): (
-          <div><ArchiveView todos={todos} selectedDate={null} /></div>
+          <div><ArchiveView archivedTodos={todos.filter(t => t.completed)}  /></div>
         )}
       </div>
     </div>

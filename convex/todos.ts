@@ -1,6 +1,6 @@
-import { v } from "convex/values";
-import { internalMutation, mutation, query } from "./_generated/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
+import { v } from "convex/values";
+import { mutation, query } from "./_generated/server";
 
 export const list = query({
   args: {},
@@ -82,8 +82,8 @@ export const remove = mutation({
   },
 });
 
-export const ClearHistory = internalMutation({
-  args: { },
+export const ClearHistory = mutation({
+  args: {},
   handler: async (ctx) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) {
@@ -92,33 +92,38 @@ export const ClearHistory = internalMutation({
 
     const cutOffTimestamp = Date.now() - 30 * 24 * 60 * 60 * 1000;
 
-    const itemsToClear = await ctx.db.query("todos2").filter((q) => 
-      q.and(
-        q.eq(q.field("completed"), true), 
-        q.lt(q.field("_creationTime"), cutOffTimestamp)
+    const itemsToClear = await ctx.db
+      .query("todos2")
+      .filter((q) =>
+        q.and(
+          q.eq(q.field("completed"), true),
+          q.lt(q.field("_creationTime"), cutOffTimestamp),
+        ),
       )
-    ).collect();
-    
-    for (const items of itemsToClear){
+      .collect();
+
+    for (const items of itemsToClear) {
       await ctx.db.delete(items._id);
-    };
-},
-})
+    }
+  },
+});
 
 export const removeAllCompleted = mutation({
-  args: { },
+  args: {},
   handler: async (ctx, _args) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) {
       throw new Error("Not authenticated");
     }
 
-    const completedTodos = await ctx.db.query("todos2").filter(q => q.eq(q.field("completed"), true)).collect();
-    for(const todo of completedTodos) {
+    const completedTodos = await ctx.db
+      .query("todos2")
+      .filter((q) => q.eq(q.field("completed"), true))
+      .collect();
+    for (const todo of completedTodos) {
       await ctx.db.delete(todo._id);
     }
     return;
-
   },
 });
 

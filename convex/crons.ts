@@ -1,15 +1,15 @@
 import { cronJobs } from "convex/server";
-import { internal } from "./_generated/api";
+import { api } from "./_generated/api";
 
 const crons = cronJobs();
 
 crons.daily(
-    "clear old completed todos",
-    {
-        hourUTC: 1,
-        minuteUTC: 0
-    },
-    internal.todos.ClearHistory
+  "clear old completed todos",
+  {
+    hourUTC: 1,
+    minuteUTC: 0,
+  },
+  api.todos.ClearHistory,
 );
 
 export default crons;

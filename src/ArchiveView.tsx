@@ -1,34 +1,18 @@
-import { useMutation, useQuery } from "convex/react";
-import { api } from "../convex/_generated/api";
-import { Id } from "../convex/_generated/dataModel";
+import { useMutation } from "convex/react";
 import { format } from "date-fns";
-
-interface Todo {
-  _id: Id<"todos2">;
-  text: string;
-  completed: boolean;
-  deadline: string;
-  important: boolean;
-  userId: Id<"users">;
-}
+import { api } from "../convex/_generated/api";
+import { Doc } from "../convex/_generated/dataModel";
 
 interface TodoListProps {
-  todos: Todo[];
-  selectedDate: string | null;
-  compact?: boolean;
+  archivedTodos: Doc<"todos2">[];
 }
 
-export default function ArchiveView({
-  todos,
-  selectedDate,
-  compact = false,
-}: TodoListProps) {
-  const allItems = useQuery(api.todos.list); // null -> []
+export default function ArchiveView({ archivedTodos }: TodoListProps) {
   const removeCompleted = useMutation(api.todos.removeAllCompleted);
-  const clearHistory = useMutation(api.todos.ClearHistory);
+  // const clearHistory = useMutation(api.todos.ClearHistory);
 
-  if (!allItems) return <div>loading...</div>;
-  const completeItems = allItems.filter((v) => v.completed);
+  if (!archivedTodos) return <div>loading...</div>;
+  const completeItems = archivedTodos.filter((v) => v.completed);
 
   const handleRemoveAll = async () => {
     await removeCompleted();
@@ -62,19 +46,12 @@ export default function ArchiveView({
         {completeItems.map((todo) => (
           <div
             key={todo._id}
-            className={`group p-4 rounded-xl border transition-all ${
-              selectedDate === todo.deadline
-                ? "border-purple-300 bg-purple-50 shadow-md"
-                : "border-purple-100 hover:border-purple-200 hover:shadow-md"
-            }`}
+            className={`group p-4 rounded-xl border transition-all border-purple-300 bg-purple-50 shadow-md`}
           >
             <div className="flex items-start gap-3">
               <div className="flex-1 min-w-0">
                 <div className="flex items-start justify-between gap-2">
-                  <p className={`font-medium  ${compact ? "text-sm" : ""}`}>
-                    {todo.text}
-                  </p>
-
+                  <p className={`font-medium text-sm`}>{todo.text}</p>
                   <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 </div>
 

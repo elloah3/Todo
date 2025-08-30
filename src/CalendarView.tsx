@@ -15,8 +15,10 @@ export function CalendarView({
   onDateSelect,
   expanded = false,
 }: CalendarViewProps) {
-  const [currentMonth, setCurrentMonth] = useState(new Date());
+  if (expanded) {
+  }
 
+  const [currentMonth, setCurrentMonth] = useState(new Date());
   const selectedDateTodos = useQuery(
     api.todos.getTodosByDate,
     selectedDate ? { date: selectedDate } : "skip",
