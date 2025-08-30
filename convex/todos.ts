@@ -1,6 +1,6 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import { internalMutation, mutation, query } from "./_generated/server";
 
 export const list = query({
   args: {},
@@ -79,32 +79,6 @@ export const remove = mutation({
     }
 
     await ctx.db.delete(args.id);
-  },
-});
-
-export const ClearHistory = mutation({
-  args: {},
-  handler: async (ctx) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
-      throw new Error("Not authenticated");
-    }
-
-    const cutOffTimestamp = Date.now() - 30 * 24 * 60 * 60 * 1000;
-
-    const itemsToClear = await ctx.db
-      .query("todos2")
-      .filter((q) =>
-        q.and(
-          q.eq(q.field("completed"), true),
-          q.lt(q.field("_creationTime"), cutOffTimestamp),
-        ),
-      )
-      .collect();
-
-    for (const items of itemsToClear) {
-      await ctx.db.delete(items._id);
-    }
   },
 });
 

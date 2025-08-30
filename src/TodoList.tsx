@@ -98,7 +98,7 @@ export function TodoList({
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg border border-purple-100 p-6 w-1/2">
+    <div className="bg-white rounded-2xl shadow-lg border border-purple-100 p-6">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-semibold text-purple-800 flex items-center gap-2">
           <span className="text-2xl">📋</span>

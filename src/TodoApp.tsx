@@ -7,9 +7,11 @@ import { CalendarView } from "./CalendarView";
 import { TodoList } from "./TodoList";
 
 export function TodoApp() {
-  const [activeView, setActiveView] = useState<"list" | "calendar" | "archive">("list");
+  const [activeView, setActiveView] = useState<"list" | "calendar" | "archive">(
+    "list",
+  );
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
-  
+
   const todos = useQuery(api.todos.list) || [];
   const deadlineDates = useQuery(api.todos.getDeadlineDates) || [];
 
@@ -17,7 +19,7 @@ export function TodoApp() {
     <div className="space-y-6">
       {/* View Toggle */}
       <div className="flex justify-center">
-        <div className="bg-white rounded-full p-1 shadow-lg border border-purple-100">
+        <div className="bg-white rounded-full p-1 shadow-lg border border-purple-100 flex justify-center">
           <button
             onClick={() => setActiveView("list")}
             className={`px-6 py-2 rounded-full font-medium transition-all ${
@@ -82,8 +84,10 @@ export function TodoApp() {
               />
             </div>
           </>
-        ): (
-          <div><ArchiveView archivedTodos={todos.filter(t => t.completed)}  /></div>
+        ) : (
+          <div>
+            <ArchiveView archivedTodos={todos.filter((t) => t.completed)} />
+          </div>
         )}
       </div>
     </div>

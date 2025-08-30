@@ -1,7 +1,8 @@
 import { useMutation } from "convex/react";
 import { format } from "date-fns";
 import { api } from "../convex/_generated/api";
-import { Doc } from "../convex/_generated/dataModel";
+import { Doc, Id } from "../convex/_generated/dataModel";
+import { toast } from "sonner";
 
 interface TodoListProps {
   archivedTodos: Doc<"todos2">[];
@@ -9,7 +10,7 @@ interface TodoListProps {
 
 export default function ArchiveView({ archivedTodos }: TodoListProps) {
   const removeCompleted = useMutation(api.todos.removeAllCompleted);
-  // const clearHistory = useMutation(api.todos.ClearHistory);
+  const remove = useMutation(api.todos.remove);
 
   if (!archivedTodos) return <div>loading...</div>;
   const completeItems = archivedTodos.filter((v) => v.completed);
@@ -17,6 +18,15 @@ export default function ArchiveView({ archivedTodos }: TodoListProps) {
   const handleRemoveAll = async () => {
     await removeCompleted();
     return;
+  };
+
+  const handleRemove = async (id: Id<"todos2">) => {
+    try {
+      await remove({ id });
+      toast.success("Todo removed! 🗑️");
+    } catch (error) {
+      toast.error("Failed to remove todo");
+    }
   };
 
   const isOverdue = (deadline: string) => {
@@ -52,7 +62,15 @@ export default function ArchiveView({ archivedTodos }: TodoListProps) {
               <div className="flex-1 min-w-0">
                 <div className="flex items-start justify-between gap-2">
                   <p className={`font-medium text-sm`}>{todo.text}</p>
-                  <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button
+                      onClick={() => handleRemove(todo._id)}
+                      className="text-red-400 hover:text-red-600 transition-colors text-lg"
+                      title="Delete todo"
+                    >
+                      🗑️
+                    </button>
+                  </div>
                 </div>
 
                 <div className="flex items-center gap-2 mt-2">
