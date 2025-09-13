@@ -98,7 +98,7 @@ export default function ArchiveView({ archivedTodos }: TodoListProps) {
 
   return (
     <div className="flex w-screen h-screen justify-evenly">
-      <div className="bg-white rounded-2xl shadow-lg border border-purple-100 p-6 w-1/3 h-1/2">
+      <div className="bg-white rounded-2xl shadow-lg border border-purple-100 p-6 w-1/3 h-3/4">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-semibold text-purple-800 flex items-center gap-2">
             Archive
@@ -140,12 +140,15 @@ export default function ArchiveView({ archivedTodos }: TodoListProps) {
                     )}
                     <span
                       className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full ${
-                        isOverdue(todo.deadline) && !todo.completed
+                        isOverdue(todo.deadline)
                           ? "bg-red-100 text-red-800"
                           : "bg-purple-100 text-purple-800"
                       }`}
                     >
                       📅 {format(todo.deadline, "yyyy-MM-dd")}
+                      {isOverdue(todo.deadline)
+                        ? " Completed Overdue"
+                        : " Completed On Time"}
                     </span>
                   </div>
                 </div>
@@ -154,7 +157,7 @@ export default function ArchiveView({ archivedTodos }: TodoListProps) {
           ))}
         </div>
       </div>
-      <div className="bg-white rounded-2xl shadow-lg border border-purple-100 p-6 w-2/3 h-2/3">
+      <div className="bg-white rounded-2xl shadow-lg border border-purple-100 p-6 w-2/3 h-1/2">
         <Line options={options} data={data} />
       </div>
     </div>
