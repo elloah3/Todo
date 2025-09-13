@@ -30,16 +30,7 @@ export function TodoApp() {
           >
             📋 Todo List
           </button>
-          <button
-            onClick={() => setActiveView("calendar")}
-            className={`px-6 py-2 rounded-full font-medium transition-all ${
-              activeView === "calendar"
-                ? "bg-purple-500 text-white shadow-md"
-                : "text-purple-600 hover:bg-purple-50"
-            }`}
-          >
-            📅 Calendar
-          </button>
+
           <button
             onClick={() => setActiveView("archive")}
             className={`px-6 py-2 rounded-full font-medium transition-all ${

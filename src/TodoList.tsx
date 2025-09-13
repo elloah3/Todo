@@ -213,6 +213,7 @@ export function TodoList({
                     }`}
                   >
                     📅 {formatDate(todo.deadline)}
+                    {isOverdue(todo.deadline) ? " Overdue" : ""}
                   </span>
                 </div>
               </div>
