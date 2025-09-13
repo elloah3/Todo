@@ -1,7 +1,8 @@
-import { useMutation } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { api } from "../convex/_generated/api";
 import { Id } from "../convex/_generated/dataModel";
 import { toast } from "sonner";
+import { useEffect, useState } from "react";
 
 interface Todo {
   _id: Id<"todos2">;
@@ -16,16 +17,21 @@ interface TodoListProps {
   todos: Todo[];
   selectedDate: string | null;
   compact?: boolean;
+  setSelectedDate: (date: string) => void;
 }
 
 export function TodoList({
   todos,
   selectedDate,
+  setSelectedDate,
   compact = false,
 }: TodoListProps) {
   const toggleTodo = useMutation(api.todos.toggle);
   const removeTodo = useMutation(api.todos.remove);
   const toggleImportant = useMutation(api.todos.toggleImportant);
+  const [selectedTodoID, setSelectedTodoID] = useState<Id<"todos2"> | null>(
+    null,
+  );
 
   const handleToggle = async (id: Id<"todos2">) => {
     try {
@@ -43,6 +49,22 @@ export function TodoList({
       toast.error("Failed to remove todo");
     }
   };
+
+  const selectedTodo = useQuery(
+    api.todos.getDeadline,
+    selectedTodoID ? { id: selectedTodoID } : "skip",
+  );
+
+  const handleTodoClick = async (id: Id<"todos2">) => {
+    setSelectedTodoID(id);
+  };
+
+  useEffect(() => {
+    if (selectedTodo?.deadline) {
+      setSelectedDate(selectedTodo.deadline);
+      console.log("could access deadline correctly");
+    }
+  }, [selectedTodo, setSelectedDate]);
 
   const handleToggleImportant = async (id: Id<"todos2">) => {
     try {
@@ -125,6 +147,7 @@ export function TodoList({
                 ? "border-purple-300 bg-purple-50 shadow-md"
                 : "border-purple-100 hover:border-purple-200 hover:shadow-md"
             } ${todo.completed ? "opacity-60" : ""}`}
+            onClick={() => handleTodoClick(todo._id)}
           >
             <div className="flex items-start gap-3">
               <button

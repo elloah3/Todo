@@ -63,13 +63,17 @@ export function TodoApp() {
         {activeView === "list" ? (
           <>
             <div className="lg:col-span-2">
-              <TodoList todos={todos} selectedDate={selectedDate} />
+              <TodoList
+                todos={todos}
+                selectedDate={selectedDate}
+                setSelectedDate={setSelectedDate}
+              />
             </div>
             <div className="lg:col-span-1">
               <CalendarView
                 deadlineDates={deadlineDates}
                 selectedDate={selectedDate}
-                onDateSelect={setSelectedDate}
+                setSelectedDate={setSelectedDate}
               />
             </div>
           </>
@@ -79,7 +83,7 @@ export function TodoApp() {
               <CalendarView
                 deadlineDates={deadlineDates}
                 selectedDate={selectedDate}
-                onDateSelect={setSelectedDate}
+                setSelectedDate={setSelectedDate}
                 expanded={true}
               />
             </div>

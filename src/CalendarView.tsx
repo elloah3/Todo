@@ -1,30 +1,38 @@
-import { useState } from "react";
 import { useQuery } from "convex/react";
 import { api } from "../convex/_generated/api";
+import { useEffect, useState } from "react";
 
 interface CalendarViewProps {
   deadlineDates: string[];
   selectedDate: string | null;
-  onDateSelect: (date: string | null) => void;
+  setSelectedDate: (date: string | null) => void;
   expanded?: boolean;
 }
 
 export function CalendarView({
   deadlineDates,
   selectedDate,
-  onDateSelect,
+  setSelectedDate,
   expanded = false,
 }: CalendarViewProps) {
   if (expanded) {
+    /* empty */
   }
 
   const [currentMonth, setCurrentMonth] = useState(new Date());
+
+  useEffect(() => {
+    if (selectedDate) {
+      setCurrentMonth(new Date(selectedDate));
+    }
+  }, [selectedDate]);
+
   const selectedDateTodos = useQuery(
     api.todos.getTodosByDate,
     selectedDate ? { date: selectedDate } : "skip",
   );
 
-  const getDaysInMonth = (date: Date) => {
+  const getDaysInMonth = (date: Date): (Date | null)[] => {
     const year = date.getFullYear();
     const month = date.getMonth();
     const firstDay = new Date(year, month, 1);
@@ -44,7 +52,7 @@ export function CalendarView({
       days.push(new Date(year, month, day));
     }
 
-    return days;
+    return days; //[D, D, D, D]
   };
 
   const formatDateString = (date: Date) => {
@@ -68,22 +76,22 @@ export function CalendarView({
   const handleDateClick = (date: Date) => {
     const dateString = formatDateString(date);
     if (hasDeadline(date)) {
-      onDateSelect(selectedDate === dateString ? null : dateString);
+      setSelectedDate(selectedDate === dateString ? null : dateString);
     }
   };
 
   const navigateMonth = (direction: "prev" | "next") => {
-    setCurrentMonth((prev) => {
-      const newDate = new Date(prev);
+    setCurrentMonth((prevMonth) => {
+      const newMonth = new Date(prevMonth);
       if (direction === "prev") {
-        newDate.setMonth(prev.getMonth() - 1);
+        newMonth.setMonth(prevMonth.getMonth() - 1);
       } else {
-        newDate.setMonth(prev.getMonth() + 1);
+        newMonth.setMonth(prevMonth.getMonth() + 1);
       }
-      return newDate;
+      return newMonth;
     });
   };
-
+  //replace everything with selecteddate and its set
   const days = getDaysInMonth(currentMonth);
   const monthName = currentMonth.toLocaleDateString("en-US", {
     month: "long",
@@ -91,8 +99,8 @@ export function CalendarView({
   });
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg border border-purple-100 p-6">
-      <div className="flex items-center justify-between mb-6">
+    <div className="bg-white rounded-2xl shadow-lg border border-purple-100 p-4">
+      <div className="flex items-center justify-between  my-3 mb-4">
         <h2 className="text-xl font-semibold text-purple-800 flex items-center gap-2">
           <span className="text-2xl">📅</span>
           Calendar

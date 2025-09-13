@@ -140,6 +140,19 @@ export const getDeadlineDates = query({
   },
 });
 
+export const getDeadline = query({
+  args:{
+    id: v.id("todos2"),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      return [];
+    }
+    return await ctx.db.get(args.id);
+  }
+})
+
 export const getTodosByDate = query({
   args: { date: v.string() },
   handler: async (ctx, args) => {
