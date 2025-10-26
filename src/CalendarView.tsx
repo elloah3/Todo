@@ -23,7 +23,7 @@ export function CalendarView({
 
   useEffect(() => {
     if (selectedDate) {
-      setCurrentMonth(new Date(selectedDate));
+      setCurrentMonth(new Date(`${selectedDate}T00:00:00`));
     }
   }, [selectedDate]);
 
@@ -91,7 +91,7 @@ export function CalendarView({
       return newMonth;
     });
   };
-  //replace everything with selecteddate and its set
+
   const days = getDaysInMonth(currentMonth);
   const monthName = currentMonth.toLocaleDateString("en-US", {
     month: "long",
@@ -172,7 +172,7 @@ export function CalendarView({
         <div className="mt-6 p-4 bg-purple-50 rounded-xl border border-purple-200">
           <h3 className="font-medium text-purple-800 mb-2 flex items-center gap-2">
             <span className="text-lg">📋</span>
-            {new Date(selectedDate).toLocaleDateString("en-US", {
+            {new Date(`${selectedDate}T00:00:00`).toLocaleDateString("en-US", {
               weekday: "long",
               month: "long",
               day: "numeric",
