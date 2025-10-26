@@ -75,7 +75,7 @@ export function TodoList({
   };
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
+    const date = new Date(`${dateString}T00:00:00`);
     const today = new Date();
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
@@ -118,6 +118,7 @@ export function TodoList({
       </div>
     );
   }
+  console.log(selectedDate);
 
   return (
     <div className="bg-white rounded-2xl shadow-lg border border-purple-100 p-6">
